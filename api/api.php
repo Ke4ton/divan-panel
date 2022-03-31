@@ -120,6 +120,96 @@ if ($_POST["method"] == "auth") {
             die();
         }
     }
+} else if ($_POST["method"] == "rust") {
+    if (!isset($_POST["key"]) || !isset($_POST["hwid"])) die();
+
+    $keyData = getKeyInfo($_POST["key"]);
+    if (!$keyData) {
+        $array = array('Status' => 'Error', 'msg' => 'Key not found');
+        echo encryptRequest(json_encode($array));
+        die();
+    }
+
+    $hwidBan = checkIfBanned($_POST["hwid"]);
+
+    if ($hwidBan) {
+        banKey($_POST["key"], "Banned system due find HWID in blacklist");
+        $array = array('Status' => 'Error', 'msg' => 'HWID Banned');
+        echo encryptRequest(json_encode($array));
+        die();
+    }
+
+    if ($keyData["status"] == "banned") {
+        $keyData = getKeyInfo($_POST["key"]);
+        $array = array('Status' => 'Error', 'msg' => 'Key banned');
+        echo encryptRequest(json_encode($array));
+        die();
+    } else {
+        $keyData = getKeyInfo($_POST["key"]);
+
+        if ($_POST["hwid"] != $keyData["hwid"]) {
+            $array = array('Status' => 'Error', 'msg' => 'HWID Doesn\'t match');
+            echo encryptRequest(json_encode($array));
+            die();
+        }
+
+        if ($keyData["subscribeend"] <= time()) {
+            $array = array('Status' => 'Error', 'msg' => 'Subscribe ended');
+            echo encryptRequest(json_encode($array));
+            die();
+        }
+
+        if ($keyData["hwid"] == $_POST["hwid"] && $keyData["subscribeend"] >= time()) {
+            $cheatFile = "../files/rust.exe";
+            echo encryptRequest(file_get_contents($cheatFile));
+            die();
+        }
+    }
+} else if ($_POST["method"] == "dayz") {
+    if (!isset($_POST["key"]) || !isset($_POST["hwid"])) die();
+
+    $keyData = getKeyInfo($_POST["key"]);
+    if (!$keyData) {
+        $array = array('Status' => 'Error', 'msg' => 'Key not found');
+        echo encryptRequest(json_encode($array));
+        die();
+    }
+
+    $hwidBan = checkIfBanned($_POST["hwid"]);
+
+    if ($hwidBan) {
+        banKey($_POST["key"], "Banned system due find HWID in blacklist");
+        $array = array('Status' => 'Error', 'msg' => 'HWID Banned');
+        echo encryptRequest(json_encode($array));
+        die();
+    }
+
+    if ($keyData["status"] == "banned") {
+        $keyData = getKeyInfo($_POST["key"]);
+        $array = array('Status' => 'Error', 'msg' => 'Key banned');
+        echo encryptRequest(json_encode($array));
+        die();
+    } else {
+        $keyData = getKeyInfo($_POST["key"]);
+
+        if ($_POST["hwid"] != $keyData["hwid"]) {
+            $array = array('Status' => 'Error', 'msg' => 'HWID Doesn\'t match');
+            echo encryptRequest(json_encode($array));
+            die();
+        }
+
+        if ($keyData["subscribeend"] <= time()) {
+            $array = array('Status' => 'Error', 'msg' => 'Subscribe ended');
+            echo encryptRequest(json_encode($array));
+            die();
+        }
+
+        if ($keyData["hwid"] == $_POST["hwid"] && $keyData["subscribeend"] >= time()) {
+            $cheatFile = "../files/dayz.exe";
+            echo encryptRequest(file_get_contents($cheatFile));
+            die();
+        }
+    }
 } else if ($_POST["method"] == "process") {
     if (!isset($_POST["key"]) || !isset($_POST["hwid"])) die();
 

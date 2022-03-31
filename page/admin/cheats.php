@@ -35,9 +35,16 @@ if (isset($_GET['type'])) {
     return header("Location: ../admin/cheats");
 }
 
-if (isset($_POST['uploadBtn']) && $_POST['uploadBtn'] == 'Upload') {
-    
+if (isset($_POST['uploadDllBtn']) && $_POST['uploadDllBtn'] == 'Upload') {
+	$dllPath = $_FILES['govno']['tmp_name'];
+	$bytes = file_get_contents($dllPath);
+	file_put_contents("../../files/" . $_POST['f'], $bytes);
+
+    echo '<script type="text/JavaScript">
+            alert( "Файл '.$_POST['f'].' успешно загружен" );
+          </script>';
 }
+
 ?>
 
 <!doctype html>
@@ -138,10 +145,10 @@ if (isset($_POST['uploadBtn']) && $_POST['uploadBtn'] == 'Upload') {
                                                         </td>
                                                         <td style="font-size: 12px;">
                                                             <div>
-                                                                <form method="POST" action="upload.php" enctype="multipart/form-data">
-
+                                                                <form method="POST" action="cheats.php" enctype="multipart/form-data">
                                                                     <input type="file" name="govno" />
-                                                                    <input type="submit" name="uploadBtn" value="Upload" />
+                                                                    <input hidden type="text" name="f" value="<?php echo $cheat['filename']; ?>"/>
+                                                                    <input type="submit" name="uploadDllBtn" value="Upload" />
                                                                 </form>
                                                             </div>
 
