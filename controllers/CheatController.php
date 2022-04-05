@@ -1,7 +1,7 @@
 <?php
 include_once 'utils.php';
 
-function сreateNewCheat($username, $cheatname, $dllname, $processname, $isUsermode)
+function сreateNewCheat($username, $cheatname, $dllname, $processname, $isUsermode, $injection_type)
 {
     global $db;
 
@@ -9,13 +9,14 @@ function сreateNewCheat($username, $cheatname, $dllname, $processname, $isUserm
     $username_sec = fix_string($username);
     $dllname_sec = fix_string($dllname);
     $processname_sec = fix_string($processname);
-    $isUsermode_sec = fix_string($isUsermode);
+    $isExternal_sec = fix_string($isUsermode);
+    $injection_type_sec = fix_string($injection_type);
 
     $query = "SELECT * FROM `cheats` WHERE `name` = '{$cheatname_sec}'";
     $row = mysqli_fetch_assoc(mysqli_query($db, $query));
 
     if (empty($row)) {
-        $query = "INSERT INTO `cheats` (`name`, `status`, `filename`, `process`, `usermode`, `creator`) VALUES ('{$cheatname_sec}', 'undetected', '{$dllname_sec}', '{$processname_sec}', '0', '{$username_sec}')";
+        $query = "INSERT INTO `cheats` (`name`, `status`, `filename`, `process`, `external`, `injection`, `creator`) VALUES ('{$cheatname_sec}', 'undetected', '{$dllname_sec}', '{$processname_sec}', '{$isExternal_sec}', '{$injection_type_sec}', '{$username_sec}')";
         mysqli_query($db, $query);
         return true;
     } else {

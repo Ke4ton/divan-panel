@@ -3,6 +3,7 @@
 require_once '../../controllers/DbController.php';
 include_once '../../controllers/UserController.php';
 include_once '../../controllers/CheatController.php';
+include_once '../../controllers/LoaderController.php';
 
 $UserCookie = login($_COOKIE['login'], $_COOKIE['password']);
 
@@ -19,23 +20,35 @@ if (!$UserCookie) {
 
 $userInfo = getUserInfo($_COOKIE['login']);
 
-$allCheats = getAllCheats();
+$loaderArray = getAllLoaders();
 
 if (isset($_GET['type'])) {
 
-
+    if ($_GET['type'] == "create"){
+        createNewLoader($_GET['name'], $_GET['file_name']);
+    }
+    if ($_GET['type'] == "update"){
+        setLoaderVersion($_GET['id']);
+    }
     return header("Location: ../admin/loader");
 }
 
-if (isset($_POST['uploadBtn']) && $_POST['uploadBtn'] == 'Upload') {
-    
+if (isset($_POST['uploadDllBtn']) && $_POST['uploadDllBtn'] == 'Upload') {
+	$dllPath = $_FILES['govno']['tmp_name'];
+	$bytes = file_get_contents($dllPath);
+	file_put_contents("../../files/" . $_POST['f'], $bytes);
+
+    echo '<script type="text/JavaScript">
+            alert( "File '.$_POST['f'].' success loaded" );
+          </script>';
 }
+
 ?>
 
 <!doctype html>
 <html lang="en">
 <?php include '../content/header.php'; ?>
-<title>Cheats | Divan Technologies</title>
+<title>Loaders | Divan Technologies</title>
 <link rel="icon" type="image/png" href="https://divan-technologies.ru/favicon.ico"/>
 
 <body class="theme-dark">
@@ -48,47 +61,37 @@ if (isset($_POST['uploadBtn']) && $_POST['uploadBtn'] == 'Upload') {
 
                 <div class="row row-cards">
 
-                    <div class="col-md-2">
+                    <div class="col-md-4">
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title">Create new cheat</h3>
+                                <h3 class="card-title">Create new loader</h3>
                             </div>
                             <div class="card-body">
-                                <form action="cheats.php" method="GET">
+                                <form action="loader.php" method="GET">
                                     <div class="mb-3">
                                         <div class="form-group mb-3 ">
 
-                                            <label class="form-label">Cheat Name</label>
+                                            <label class="form-label">Loader Name</label>
                                             <input type="text" name="name" class="form-control" autocomplete="off">
                                         </div>
 
                                         <div class="form-group mb-3 ">
-                                            <label class="form-label">Process Name</label>
-                                            <input type="text" name="process" class="form-control" autocomplete="off">
-                                        </div>
-
-                                        <div class="form-group mb-3 ">
-                                            <label class="form-label">Dll Name</label>
-                                            <input type="text" name="dll_name" class="form-control" autocomplete="off">
-                                        </div>
-
-                                        <div class="form-check">
-                                            <input class="form-check-input" name="isUsermode" type="checkbox" value="Yes" id="flexCheckDefault">
-                                            <label class="form-check-label" for="flexCheckDefault">Usermode [indev]</label>
-                                            <input type="hidden" name="type" value="create">
+                                            <label class="form-label">File Name</label>
+                                            <input type="text" name="file_name" class="form-control" autocomplete="off">
                                         </div>
 
                                     </div>
+                                    <input type="hidden" name="type" value="create">
                                     <button type="submit" class="btn btn-primary ms-auto">Create</button>
                                 </form>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-md-10">
+                    <div class="col-md-8">
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title">Cheats</h3>
+                                <h3 class="card-title">Loaders</h3>
                             </div>
                             <div class="table-responsive">
                                 <table class="table table-vcenter card-table">
@@ -96,100 +99,43 @@ if (isset($_POST['uploadBtn']) && $_POST['uploadBtn'] == 'Upload') {
                                         <tr>
                                             <th>ID</th>
                                             <th>Name</th>
-                                            <th>Process</th>
-                                            <th>Status</th>
-                                            <th>Actions</th>
+                                            <th>Version</th>
                                             <th>File</th>
-                                            <th>Owner</th>
+                                            <th>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <?php
                                         if ($userInfo['role'] == "admin") {
-                                            if (is_array($allCheats)) {
-                                                foreach ($allCheats as $cheat) { ?>
+                                            if (is_array($loaderArray)) {
+                                                foreach ($loaderArray as $loader) { ?>
                                                     <tr>
                                                         <td style="font-size: 12px;">
-                                                            <?php echo $cheat['id']; ?>
+                                                            <?php echo $loader['id']; ?>
                                                         </td>
                                                         <td style="font-size: 12px;">
-                                                            <?php echo $cheat['name']; ?>
+                                                            <?php echo $loader['name']; ?>
                                                         </td>
                                                         <td style="font-size: 12px;">
-                                                            <?php echo $cheat['process']; ?>
-                                                        </td>
-                                                        <td style="font-size: 12px;">
-                                                            <?php echo $cheat['status']; ?>
-                                                        </td>
-                                                        <td style="font-size: 12px;">
-                                                            <a href="../admin/cheats.php?type=freeze&id=<?php echo $cheat['id']; ?>" class="badge bg-blue-lt">Freeze</a>
-
-                                                            <a href="../admin/cheats.php?type=unfreeze&id=<?php echo $cheat['id']; ?>" class="badge bg-green-lt">Unfreeze</a>
-
-                                                            <a href="../admin/cheats.php?type=delete&id=<?php echo $cheat['id']; ?>" class="badge bg-red-lt">Delete</a>
+                                                            <?php echo $loader['version']; ?>
                                                         </td>
                                                         <td style="font-size: 12px;">
                                                             <div>
-                                                                <form method="POST" action="upload.php" enctype="multipart/form-data">
-
+                                                            <form method="POST" action="loader.php" enctype="multipart/form-data">
                                                                     <input type="file" name="govno" />
-                                                                    <input type="submit" name="uploadBtn" value="Upload" />
+                                                                    <input hidden type="text" name="f" value="<?php echo $loader['file']; ?>"/>
+                                                                    <input type="submit" name="uploadDllBtn" value="Upload" />
                                                                 </form>
                                                             </div>
-
                                                         </td>
                                                         <td style="font-size: 12px;">
-                                                            <?php echo $cheat['creator']; ?>
+                                                            <a href="../admin/loader.php?type=update&id=<?php echo $loader['id']; ?>" class="badge bg-green-lt">Update</a>
                                                         </td>
                                                     </tr>
                                         <?php
                                                 }
                                             }
                                         }
-                                        ?>
-                                        <?php
-                                        if ($userInfo['role'] == "renter") {
-                                            if (is_array($allCheats)) {
-                                                foreach ($allCheats as $cheat) {
-                                                    if ($cheat['creator'] == $_COOKIE['login']) {
-                                        ?>
-                                                        <tr>
-                                                            <td style="font-size: 12px;">
-                                                                <?php echo $cheat['id']; ?>
-                                                            </td>
-                                                            <td style="font-size: 12px;">
-                                                                <?php echo $cheat['name']; ?>
-                                                            </td>
-                                                            <td style="font-size: 12px;">
-                                                                <?php echo $cheat['process']; ?>
-                                                            </td>
-                                                            <td style="font-size: 12px;">
-                                                                <?php echo $cheat['status']; ?>
-                                                            </td>
-                                                            <td style="font-size: 12px;">
-                                                                <a href="../admin/cheats.php?type=freeze&id=<?php echo $cheat['id']; ?>" class="badge bg-blue-lt">Freeze</a>
-
-                                                                <a href="../admin/cheats.php?type=unfreeze&id=<?php echo $cheat['id']; ?>" class="badge bg-green-lt">Unfreeze</a>
-
-                                                                <a href="../admin/cheats.php?type=delete&id=<?php echo $cheat['id']; ?>" class="badge bg-red-lt">Delete</a>
-                                                            </td>
-                                                            <td style="font-size: 12px;">
-                                                                <div>
-                                                                    <input type="file" name="uploadedFile" />
-                                                                    <input type="submit" name="uploadBtn" value="Upload" />
-
-                                                                </div>
-
-                                                            </td>
-                                                            <td style="font-size: 12px;">
-                                                                <?php echo $cheat['creator']; ?>
-                                                            </td>
-                                                        </tr>
-                                        <?php       }
-                                                }
-                                            }
-                                        }
-
                                         ?>
                                     </tbody>
                                 </table>

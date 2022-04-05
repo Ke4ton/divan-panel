@@ -61,7 +61,7 @@ function deleteUser($username)
 
    $login = fix_string($username);
 
-   $query = "DELETE FROM `users` WHERE `username` = '{$login}'";
+   $query = "DELETE FROM `users` WHERE `username` = '{$login}' LIMIT 1";
    mysqli_query($db, $query);
 }
 

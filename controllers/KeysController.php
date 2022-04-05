@@ -21,10 +21,25 @@ function banKey($key, $reason)
     $key_sec = fix_string($key);
     $reason_sec = fix_string($reason);
 
-    $query = "UPDATE `keys` SET `status` = 'banned' WHERE `key` = '{$key_sec}'";
+    $query = "UPDATE `keys` SET `status` = 'banned' WHERE `key` = '{$key_sec}' LIMIT 1";
     mysqli_query($db, $query);
 
-    $query = "UPDATE `keys` SET `banreason` = '{$reason_sec}' WHERE `key` = '{$key_sec}'";
+    $query = "UPDATE `keys` SET `banreason` = '{$reason_sec}' WHERE `key` = '{$key_sec}' LIMIT 1";
+    mysqli_query($db, $query);
+
+    return true;
+}
+
+function unbanKey($key)
+{
+    global $db;
+
+    $key_sec = fix_string($key);
+
+    $query = "UPDATE `keys` SET `status` = 'activated' WHERE `key` = '{$key_sec}' LIMIT 1";
+    mysqli_query($db, $query);
+
+    $query = "UPDATE `keys` SET `banreason` = '' WHERE `key` = '{$key_sec}' LIMIT 1";
     mysqli_query($db, $query);
 
     return true;
@@ -36,7 +51,7 @@ function deleteKey($key_id)
 
     $id_sec = fix_string($key_id);
 
-    $query = "DELETE FROM `keys` WHERE `id` = '{$id_sec}'";
+    $query = "DELETE FROM `keys` WHERE `id` = '{$id_sec}' LIMIT 1";
     mysqli_query($db, $query);
 }
 
@@ -46,7 +61,7 @@ function resetHwidOnKey($key)
 
     $key_sec = fix_string($key);
 
-    $query = "UPDATE `keys` SET `hwid` = '' WHERE `key` = '{$key_sec}'";
+    $query = "UPDATE `keys` SET `hwid` = '' WHERE `key` = '{$key_sec}' LIMIT 1";
     mysqli_query($db, $query);
 }
 

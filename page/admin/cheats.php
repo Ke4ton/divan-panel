@@ -23,7 +23,11 @@ $allCheats = getAllCheats();
 
 if (isset($_GET['type'])) {
     if ($_GET['type'] == "create") {
-        сreateNewCheat($_COOKIE['login'], $_GET['name'], $_GET['dll_name'], $_GET['process'], false);
+        if( $_GET['cheattype'] == "internal") { 
+            сreateNewCheat($_COOKIE['login'], $_GET['name'], $_GET['dll_name'], $_GET['process'], 0, $_GET['injection_type']);
+        } else {
+            сreateNewCheat($_COOKIE['login'], $_GET['name'], $_GET['dll_name'], $_GET['process'], 1, $_GET['injection_type']);
+        }
     } else if ($_GET['type'] == "freeze") {
         freezeCheat($_GET['id']);
     } else if ($_GET['type'] == "unfreeze") {
@@ -41,7 +45,7 @@ if (isset($_POST['uploadDllBtn']) && $_POST['uploadDllBtn'] == 'Upload') {
 	file_put_contents("../../files/" . $_POST['f'], $bytes);
 
     echo '<script type="text/JavaScript">
-            alert( "Файл '.$_POST['f'].' успешно загружен" );
+            alert( "File '.$_POST['f'].' success loaded" );
           </script>';
 }
 
@@ -83,17 +87,27 @@ if (isset($_POST['uploadDllBtn']) && $_POST['uploadDllBtn'] == 'Upload') {
                                         </div>
 
                                         <div class="form-group mb-3 ">
-                                            <label class="form-label">Dll Name</label>
+                                            <label class="form-label">File Name</label>
                                             <input type="text" name="dll_name" class="form-control" autocomplete="off">
                                         </div>
 
-                                        <div class="form-check">
-                                            <input class="form-check-input" name="isUsermode" type="checkbox" value="Yes" id="flexCheckDefault">
-                                            <label class="form-check-label" for="flexCheckDefault">Usermode [indev]</label>
-                                            <input type="hidden" name="type" value="create">
+                                        <div class="form-group mb-3 ">
+                                            <label class="form-label">Cheat Type</label>
+                                            <select class="form-select" name="cheattype">
+                                                <option value="<?php echo "internal"; ?>">Internal</option>
+                                                <option value="<?php echo "external"; ?>">External</option>
+                                            </select>
                                         </div>
-
+                                        <div class="form-group mb-3 ">
+                                            <label class="form-label">Injection Type</label>
+                                            <select class="form-select" name="injection_type">
+                                                <option value="<?php echo "default"; ?>">Default</option>
+                                                <option value="<?php echo "rwx"; ?>">RWX</option>
+                                                <option value="<?php echo "rwnx"; ?>">RW+NX</option>
+                                            </select>
+                                        </div>
                                     </div>
+                                    <input type="hidden" name="type" value="create">
                                     <button type="submit" class="btn btn-primary ms-auto">Create</button>
                                 </form>
                             </div>

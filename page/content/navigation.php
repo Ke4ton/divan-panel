@@ -28,7 +28,14 @@ $userRole = getUserInfo($_COOKIE['login']);
                 <li class="nav-item">
                   <a class="nav-link" href="../admin/keys" data-bs-toggle="dropdown" role="button" aria-expanded="false">
                     <span class="nav-link-title">
-                      Keys
+                      All Keys
+                    </span>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="../admin/activated_keys" data-bs-toggle="dropdown" role="button" aria-expanded="false">
+                    <span class="nav-link-title">
+                      Activated Keys
                     </span>
                   </a>
                 </li>
@@ -62,6 +69,15 @@ $userRole = getUserInfo($_COOKIE['login']);
                   <a class="nav-link" href="../admin/users" data-bs-toggle="dropdown" role="button" aria-expanded="false">
                     <span class="nav-link-title">
                       Users
+                    </span>
+                  </a>
+                </li>
+                <?php } ?>
+                <?php if($userRole['role'] == "admin"){ ?>
+                <li class="nav-item">
+                  <a class="nav-link" href="../admin/loader" data-bs-toggle="dropdown" role="button" aria-expanded="false">
+                    <span class="nav-link-title">
+                      Loaders
                     </span>
                   </a>
                 </li>

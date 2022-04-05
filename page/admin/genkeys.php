@@ -22,7 +22,7 @@ if (isset($_GET['type'])) {
     if ($_GET['type'] == "create") {
         for ($i = 0; $i < intval($_GET['amount']); $i++) {
             $permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-            generateNewKeys(substr(str_shuffle($permitted_chars), 0, 32), $_COOKIE['login'], $_GET['cheat'], $_GET['time'] * 86400);
+            generateNewKeys(substr(str_shuffle($permitted_chars), 0, 18), $_COOKIE['login'], $_GET['cheat'], $_GET['time'] * 86400);
         }
         return header("Location: ../admin/genkeys");
     }

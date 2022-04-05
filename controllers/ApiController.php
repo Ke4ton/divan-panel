@@ -8,7 +8,7 @@ function setKeyHwid($key, $hwid)
     $key_sec = fix_string($key);
     $hwid_sec = fix_string($hwid);
 
-    $query = "UPDATE `keys` SET `hwid` = '{$hwid_sec}' WHERE `key` = '{$key_sec}'";
+    $query = "UPDATE `keys` SET `hwid` = '{$hwid_sec}' WHERE `key` = '{$key_sec}' LIMIT 1";
     mysqli_query($db, $query);
 }
 
@@ -29,7 +29,7 @@ function expireKey($key)
 
     $key_sec = fix_string($key);
 
-    $query = "UPDATE `keys` SET `status` = 'ended' WHERE `key` = '{$key_sec}'";
+    $query = "UPDATE `keys` SET `status` = 'ended' WHERE `key` = '{$key_sec}' LIMIT 1";
     mysqli_query($db, $query);
 }
 
@@ -40,7 +40,7 @@ function setFirstIp($key)
     $key_sec = fix_string($key);
     $ip = $_SERVER['REMOTE_ADDR'];
 
-    $query = "UPDATE `keys` SET `firstip` = '{$ip}' WHERE `key` = '{$key_sec}'";
+    $query = "UPDATE `keys` SET `firstip` = '{$ip}' WHERE `key` = '{$key_sec}' LIMIT 1";
     mysqli_query($db, $query);
 }
 
@@ -51,7 +51,7 @@ function setLastIp($key)
     $key_sec = fix_string($key);
     $ip = $_SERVER['REMOTE_ADDR'];
 
-    $query = "UPDATE `keys` SET `lastip` = '{$ip}' WHERE `key` = '{$key_sec}'";
+    $query = "UPDATE `keys` SET `lastip` = '{$ip}' WHERE `key` = '{$key_sec}' LIMIT 1";
     mysqli_query($db, $query);
 }
 
