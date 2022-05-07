@@ -15,7 +15,6 @@ $userInfo = getUserInfo($_COOKIE['login']);
 $KeysRow = getAllKeys();
 
 // костыль ебаный, но так как сроки горят делаю максимально быстро
-$keysRow = getAllKeys();
 $allCheats = getAllCheats();
 
 if(isset($_GET['type']))
@@ -203,11 +202,11 @@ if(isset($_GET['type']))
 
                                         </td>
                                         <td style="font-size: 12px;">
-                                        <?php echo $key['firstip']; ?>
+                                        <?php echo $KeysRow['firstip']; ?>
 
                                         </td>
                                         <td style="font-size: 12px;">
-                                        <?php echo $key['lastip']; ?>
+                                        <?php echo $KeysRow['lastip']; ?>
 
                                         </td>
                                 <?php } 
@@ -306,11 +305,11 @@ if(isset($_GET['type']))
 
                                         </td>
                                         <td style="font-size: 12px;">
-                                        <?php echo $key['firstip']; ?>
+                                        <?php echo $KeysRow['firstip']; ?>
 
                                         </td>
                                         <td style="font-size: 12px;">
-                                        <?php echo $key['lastip']; ?>
+                                        <?php echo $KeysRow['lastip']; ?>
 
                                         </td>
                                     <?php } }?>
@@ -371,7 +370,7 @@ if(isset($_GET['type']))
                                     }
                                     ?>
                                     </tr>
-                                    <?php } else {  if($userInfo['owner'] == $KeysRow['creator']) {?>
+                                    <?php } else {  if($KeysRow['creator'] == $_COOKIE['login']) {?>
                                         <td style="font-size: 12px;">
                                                 <?php  echo $KeysRow['id']; ?>
                                             </td>

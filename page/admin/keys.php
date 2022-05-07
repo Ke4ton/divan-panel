@@ -56,7 +56,6 @@ if(isset($_GET['type']))
 
 }
 ?>
-
 <!doctype html>
 <html lang="en">
 <title>Keys | Divan Technologies</title>
@@ -229,8 +228,10 @@ if(isset($_GET['type']))
                                    if (!isset($_GET['type'])){
                                          if(is_array($KeysRow)) {
                                             foreach($KeysRow as $key) {  
-                                                if($key['creator'] == $_COOKIE['login'])
-                                                 {?>
+                                                $cheatInfo = getCheatInfo($key['cheat']);
+
+                                                if($key['creator'] == $_COOKIE['login'] || $_COOKIE['login'] == $cheatInfo['creator'])
+                                                {?>
                                         <tr>
                                         <td style="font-size: 12px;">
                                             <?php  echo $key['id']; ?>
@@ -396,7 +397,7 @@ if(isset($_GET['type']))
                                     }
                                     ?>
                                     </tr>
-                                    <?php } else {  if($userInfo['owner'] == $KeysRow['creator']) {?>
+                                    <?php } else {  if($KeysRow['creator'] == $_COOKIE['login']) {?>
                                         <td style="font-size: 12px;">
                                                 <?php  echo $KeysRow['id']; ?>
                                             </td>

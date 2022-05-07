@@ -13,7 +13,7 @@ function banHwid($hwid, $reason)
     $row = mysqli_fetch_assoc(mysqli_query($db, $query));
 
     if (empty($row)) {
-        $query = "INSERT INTO `hwids` (`hwid`, `reason`) VALUES ('{$hwid_sec}', '{$reason_sec}') LIMIT 1";
+        $query = "INSERT INTO `hwids` (`hwid`, `reason`) VALUES ('{$hwid_sec}', '{$reason_sec}')";
         mysqli_query($db, $query);
        return true;
     } else {

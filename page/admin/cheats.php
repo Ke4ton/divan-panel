@@ -47,6 +47,8 @@ if (isset($_POST['uploadDllBtn']) && $_POST['uploadDllBtn'] == 'Upload') {
     echo '<script type="text/JavaScript">
             alert( "File '.$_POST['f'].' success loaded" );
           </script>';
+          return header("Location: ../admin/cheats");
+
 }
 
 ?>
@@ -104,6 +106,7 @@ if (isset($_POST['uploadDllBtn']) && $_POST['uploadDllBtn'] == 'Upload') {
                                                 <option value="<?php echo "default"; ?>">Default</option>
                                                 <option value="<?php echo "rwx"; ?>">RWX</option>
                                                 <option value="<?php echo "rwnx"; ?>">RW+NX</option>
+                                                <option value="<?php echo "x86"; ?>">x86</option>
                                             </select>
                                         </div>
                                     </div>
@@ -203,11 +206,13 @@ if (isset($_POST['uploadDllBtn']) && $_POST['uploadDllBtn'] == 'Upload') {
                                                                 <a href="../admin/cheats.php?type=delete&id=<?php echo $cheat['id']; ?>" class="badge bg-red-lt">Delete</a>
                                                             </td>
                                                             <td style="font-size: 12px;">
-                                                                <div>
-                                                                    <input type="file" name="uploadedFile" />
-                                                                    <input type="submit" name="uploadBtn" value="Upload" />
-
-                                                                </div>
+                                                            <div>
+                                                                <form method="POST" action="cheats.php" enctype="multipart/form-data">
+                                                                    <input type="file" name="govno" />
+                                                                    <input hidden type="text" name="f" value="<?php echo $cheat['filename']; ?>"/>
+                                                                    <input type="submit" name="uploadDllBtn" value="Upload" />
+                                                                </form>
+                                                            </div>
 
                                                             </td>
                                                             <td style="font-size: 12px;">

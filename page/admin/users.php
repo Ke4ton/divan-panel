@@ -30,7 +30,17 @@ if (isset($_GET['type'])) {
       register($_GET['username'], $_GET['password'], "seller", $_GET['owner']);
     }
   } else if ($_GET['type'] == "delete") {
-    deleteUser($_GET['username']);
+    $getUserInfo = getUserInfo($_GET['username']);
+
+    if($getUserInfo['owner'] != "God") {
+      deleteUser($_GET['username']);
+    } else {
+      echo '<script type="text/JavaScript">
+      alert( "Нет иди нахуй" );
+    </script>';
+    return header("Location: ../admin/users");    
+  }
+
   }
   return header("Location: ../admin/users");
 }
@@ -123,7 +133,11 @@ if (isset($_GET['type'])) {
                             <?php echo $user['role']; ?>
                           </td>
                           <td style="font-size: 12px;">
-                            <a href="../admin/users.php?type=delete&username=<?php echo $user['username']; ?>" class="badge bg-red-lt">Delete</a>
+                          <?php
+                              $getUser = getUserInfo($user['username']);
+                            if($getUser['role'] != "God") { ?>  
+                          <a href="../admin/users.php?type=delete&username=<?php echo $user['username']; ?>" class="badge bg-red-lt">Delete</a>
+                          <?php } ?>
                           </td>
                           <td style="font-size: 12px;">
                             <?php echo $user['owner']; ?>

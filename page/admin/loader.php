@@ -41,6 +41,8 @@ if (isset($_POST['uploadDllBtn']) && $_POST['uploadDllBtn'] == 'Upload') {
     echo '<script type="text/JavaScript">
             alert( "File '.$_POST['f'].' success loaded" );
           </script>';
+          return header("Location: ../admin/loader");
+
 }
 
 ?>

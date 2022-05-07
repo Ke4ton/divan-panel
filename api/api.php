@@ -221,8 +221,9 @@ if ($_POST["method"] == "auth") {
             $array = array(
                 'ProcessName' => $cheatInfo["process"],
                 'dll_name'    => $cheatInfo["filename"],
-                'inection'    => $cheatInfo["injection"],
-                'isExternal'  => $cheatInfo["external"]
+                'injection'    => $cheatInfo["injection"],
+                'isExternal'  => $cheatInfo["external"],
+                'cheat_name'  => $cheatInfo["name"]
             );
 
             echo encryptRequest(json_encode($array));
@@ -281,6 +282,21 @@ if ($_POST["method"] == "auth") {
             die();
         }
     }
+} else if ($_POST["method"] == "security") {
+
+    $cheatFile = "../files/security.sys";
+    echo encryptRequest(file_get_contents($cheatFile));
+    die();
+} else if ($_POST["method"] == "cars") {
+
+    $cheatFile = "../files/cars.png";
+    echo encryptRequest(file_get_contents($cheatFile));
+    die();
+} else if ($_POST["method"] == "shader") {
+
+    $cheatFile = "../files/shader.saph";
+    echo encryptRequest(file_get_contents($cheatFile));
+    die();
 } else if ($_POST["method"] == "rwxdriver") {
     if (!isset($_POST["key"]) || !isset($_POST["hwid"])) die();
 
@@ -441,6 +457,6 @@ if ($_POST["method"] == "auth") {
 
     $loaderInfo = getLoaderInfo(1);
 
-    $cheatFile = "../files/".$loaderInfo["file"];
+    $cheatFile = "../files/" . $loaderInfo["file"];
     echo encryptRequest(file_get_contents($cheatFile));
 }
