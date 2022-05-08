@@ -6,16 +6,22 @@ include_once '../../controllers/KeysController.php';
 include_once '../../controllers/CheatController.php';
 
 $UserCookie = login($_COOKIE['login'], $_COOKIE['password']);
+if(!isset($_GET['page'])) {
+    $page = 1;
+}
+else {
+    $page = $_GET['page'];
+}
+
 if (!$UserCookie) {
     return header('Location: /index.php');
 }
 
 $userInfo = getUserInfo($_COOKIE['login']);
 
-$KeysRow = getAllKeys();
+$KeysRow = getAllKeys($page);
 
 // костыль ебаный, но так как сроки горят делаю максимально быстро
-$keysRow = getAllKeys();
 $allCheats = getAllCheats();
 
 if (isset($_GET['type'])) {
@@ -92,8 +98,8 @@ if (isset($_GET['type'])) {
                             <div class="form-group mb-3 ">
                                 <label class="form-label">Not activated keys</label>
                                 <textarea class="form-control" name="example-textarea-input" rows="5" placeholder="Content..">
-                                    <?php if (is_array($keysRow))
-                                        foreach ($keysRow as $key2) {
+                                    <?php if (is_array($KeysRow))
+                                        foreach ($KeysRow as $key2) {
                                             if ($key2['status'] == "waiting") {
                                                 if ($userInfo['role'] == "renter") {
                                                     if ($key2['creator'] == $_COOKIE['login']) {

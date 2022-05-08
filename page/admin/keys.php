@@ -1,21 +1,26 @@
-<?php 
+<?php
 
 require_once '../../controllers/DbController.php';
 include_once '../../controllers/UserController.php';
 include_once '../../controllers/KeysController.php';
 include_once '../../controllers/CheatController.php';
+include_once '../../controllers/PageController.php';
 
 $UserCookie = login($_COOKIE['login'], $_COOKIE['password']);
+if(!isset($_GET['page'])) {
+    $page = 1;
+}
+else {
+    $page = $_GET['page'];
+}
 if(!$UserCookie){
     return header('Location: /index.php');
 }
 
 $userInfo = getUserInfo($_COOKIE['login']);
 
-$KeysRow = getAllKeys();
-
 // костыль ебаный, но так как сроки горят делаю максимально быстро
-$keysRow = getAllKeys();
+$KeysRow = getAllKeys($page);
 $allCheats = getAllCheats();
 
 if(isset($_GET['type']))
@@ -43,7 +48,7 @@ if(isset($_GET['type']))
     {
         banKey($_GET['key'], "banned by ".$_COOKIE['login']." from admin panel");
         return header("Location: ../admin/keys");
-    } 
+    }
     else if($_GET['type'] == "unban")
     {
         unbanKey($_GET['key']);
@@ -65,28 +70,28 @@ if(isset($_GET['type']))
 <body class="theme-dark">
 <div class="wrapper">
 
-<?php include '../content/navigation.php';?>
+    <?php include '../content/navigation.php';?>
     <div class="content">
         <div class="container-xl">
 
-        <div class="row row-cards">
-        <div class="col-12">
-                <div class="card card-sm">
-                    <div class="card-body">
-                        <form role="form" method="GET" action="keys.php">
-                            <div class="row g-2">
-                                <div class="col">
-                                    <input type="text" class="form-control" name="key" placeholder="Key to find" autocomplete="off">
-                                    <input type="hidden" class="form-control" name="type" value="search" placeholder="Find Key">
+            <div class="row row-cards">
+                <div class="col-12">
+                    <div class="card card-sm">
+                        <div class="card-body">
+                            <form role="form" method="GET" action="keys.php">
+                                <div class="row g-2">
+                                    <div class="col">
+                                        <input type="text" class="form-control" name="key" placeholder="Key to find" autocomplete="off">
+                                        <input type="hidden" class="form-control" name="type" value="search" placeholder="Find Key">
+                                    </div>
+                                    <div class="col-auto">
+                                        <button href="#" type="submit" class="btn btn-dark btn-icon" aria-label="Button">Find Key</button>
+                                    </div>
                                 </div>
-                                <div class="col-auto">
-                                    <button href="#" type="submit" class="btn btn-dark btn-icon" aria-label="Button">Find Key</button>
-                                </div>
-                            </div>
-                        </form>
+                            </form>
+                        </div>
                     </div>
                 </div>
-        </div>
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-header">
@@ -110,67 +115,67 @@ if(isset($_GET['type']))
                                 </thead>
                                 <tbody>
                                 <?php if ($userInfo['role'] == "admin"){
-                                        if (!isset($_GET['type'])){
-                                                if(is_array($KeysRow)) {
-                                                    foreach($KeysRow as $key) 
-                                                    { ?>
-                                        <tr>
-                                        <td style="font-size: 12px;">
-                                            <?php  echo $key['id']; ?>
-                                        </td>
-                                        <td style="font-size: 12px;">
-                                            <?php echo $key['key']; ?>
-                                        </td>
-                                        <td style="font-size: 12px;">
-                                            <?php echo $key['hwid']; ?>
-                                        </td>
-                                        <td style="font-size: 12px;">
-                                            <?php echo $key['subscribe'] / 86400; ?>
-                                        </td>
-                                        <td style="font-size: 12px;">
-                                            <?php if($key['status'] == "waiting") { ?>
-                                                <span class="badge bg-yellow-lt">Waiting</span>
-                                            <?php } ?>
-                                            <?php if($key['status'] == "banned") { ?>
-                                                <span class="badge bg-red-lt">Banned</span>
-                                            <?php } ?>
-                                            <?php if($key['status'] == "activated") { ?>
-                                                <span class="badge bg-green-lt">activated</span>
-                                            <?php } ?>
-                                            <?php if($key['status'] == "ended") { ?>
-                                                <span class="badge bg-blue-lt">expired</span>
-                                            <?php } ?>
-                                        </td>
-                                        
-                                        <td style="font-size: 12px;">
-                                        <a href="../admin/keys.php?type=delete&id=<?php echo $key['id']; ?>" class="badge bg-red-lt">Delete</a>
-                                        <a href="../admin/keys.php?type=reset&key=<?php echo $key['key']; ?>" class="badge bg-yellow-lt">Reset HWID</a>
-                                        <?php if( $key['status'] == "banned") { ?>
-                                        <a href="../admin/keys.php?type=unban&key=<?php echo $key['key']; ?>" class="badge bg-green-lt">Unban</a>
-                                        <?php } else { ?>
-                                        <a href="../admin/keys.php?type=ban&key=<?php echo $key['key']; ?>" class="badge bg-blue-lt">Ban</a>
-                                        <?php } ?>
-                                        </td>
-                                        <td style="font-size: 12px;">
-                                        <?php $cheatInfo = getCheatInfo($key['cheat']); echo $cheatInfo['name']; ?>
-                                        </td>
-                                        <td style="font-size: 12px;">
-                                        <?php echo $key['creator']; ?>
+                                    if (!isset($_GET['type'])){
+                                        if(is_array($KeysRow)) {
+                                            foreach($KeysRow as $key)
+                                            { ?>
+                                                <tr>
+                                                <td style="font-size: 12px;">
+                                                    <?php  echo $key['id']; ?>
+                                                </td>
+                                                <td style="font-size: 12px;">
+                                                    <?php echo $key['key']; ?>
+                                                </td>
+                                                <td style="font-size: 12px;">
+                                                    <?php echo $key['hwid']; ?>
+                                                </td>
+                                                <td style="font-size: 12px;">
+                                                    <?php echo $key['subscribe'] / 86400; ?>
+                                                </td>
+                                                <td style="font-size: 12px;">
+                                                    <?php if($key['status'] == "waiting") { ?>
+                                                        <span class="badge bg-yellow-lt">Waiting</span>
+                                                    <?php } ?>
+                                                    <?php if($key['status'] == "banned") { ?>
+                                                        <span class="badge bg-red-lt">Banned</span>
+                                                    <?php } ?>
+                                                    <?php if($key['status'] == "activated") { ?>
+                                                        <span class="badge bg-green-lt">activated</span>
+                                                    <?php } ?>
+                                                    <?php if($key['status'] == "ended") { ?>
+                                                        <span class="badge bg-blue-lt">expired</span>
+                                                    <?php } ?>
+                                                </td>
 
-                                        </td>
-                                        <td style="font-size: 12px;">
-                                        <?php echo $key['firstip']; ?>
+                                                <td style="font-size: 12px;">
+                                                    <a href="../admin/keys.php?type=delete&id=<?php echo $key['id']; ?>" class="badge bg-red-lt">Delete</a>
+                                                    <a href="../admin/keys.php?type=reset&key=<?php echo $key['key']; ?>" class="badge bg-yellow-lt">Reset HWID</a>
+                                                    <?php if( $key['status'] == "banned") { ?>
+                                                        <a href="../admin/keys.php?type=unban&key=<?php echo $key['key']; ?>" class="badge bg-green-lt">Unban</a>
+                                                    <?php } else { ?>
+                                                        <a href="../admin/keys.php?type=ban&key=<?php echo $key['key']; ?>" class="badge bg-blue-lt">Ban</a>
+                                                    <?php } ?>
+                                                </td>
+                                                <td style="font-size: 12px;">
+                                                    <?php $cheatInfo = getCheatInfo($key['cheat']); echo $cheatInfo['name']; ?>
+                                                </td>
+                                                <td style="font-size: 12px;">
+                                                    <?php echo $key['creator']; ?>
 
-                                        </td>
-                                        <td style="font-size: 12px;">
-                                        <?php echo $key['lastip']; ?>
+                                                </td>
+                                                <td style="font-size: 12px;">
+                                                    <?php echo $key['firstip']; ?>
 
-                                        </td>
-                                    <?php } 
-                                    }
-                                ?>
-                                </tr>
-                                <?php } else { ?>
+                                                </td>
+                                                <td style="font-size: 12px;">
+                                                    <?php echo $key['lastip']; ?>
+
+                                                </td>
+                                            <?php }
+                                        }
+                                        ?>
+                                        </tr>
+                                    <?php } else { ?>
                                         <td style="font-size: 12px;">
                                             <?php  echo $KeysRow['id']; ?>
                                         </td>
@@ -197,222 +202,222 @@ if(isset($_GET['type']))
                                                 <span class="badge bg-blue-lt">expired</span>
                                             <?php } ?>
                                         </td>
-                                        
+
                                         <td style="font-size: 12px;">
-                                        <a href="../admin/keys.php?type=delete&id=<?php echo $KeysRow['id']; ?>" class="badge bg-red-lt">Delete</a>
-                                        <a href="../admin/keys.php?type=reset&key=<?php echo $KeysRow['key']; ?>" class="badge bg-yellow-lt">Reset HWID</a>
-                                        <?php if( $KeysRow['status'] == "banned") { ?>
-                                        <a href="../admin/keys.php?type=unban&key=<?php echo $KeysRow['key']; ?>" class="badge bg-green-lt">Unban</a>
-                                        <?php } else { ?>
-                                        <a href="../admin/keys.php?type=ban&key=<?php echo $KeysRow['key']; ?>" class="badge bg-blue-lt">Ban</a>
-                                        <?php } ?>
-                                    
-                                        </td>
-                                        <td style="font-size: 12px;">
-                                        <?php $cheatInfo = getCheatInfo($KeysRow['cheat']); echo $cheatInfo['name']; ?>
-                                        </td>
-                                        <td style="font-size: 12px;">
-                                        <?php echo $KeysRow['creator']; ?>
+                                            <a href="../admin/keys.php?type=delete&id=<?php echo $KeysRow['id']; ?>" class="badge bg-red-lt">Delete</a>
+                                            <a href="../admin/keys.php?type=reset&key=<?php echo $KeysRow['key']; ?>" class="badge bg-yellow-lt">Reset HWID</a>
+                                            <?php if( $KeysRow['status'] == "banned") { ?>
+                                                <a href="../admin/keys.php?type=unban&key=<?php echo $KeysRow['key']; ?>" class="badge bg-green-lt">Unban</a>
+                                            <?php } else { ?>
+                                                <a href="../admin/keys.php?type=ban&key=<?php echo $KeysRow['key']; ?>" class="badge bg-blue-lt">Ban</a>
+                                            <?php } ?>
 
                                         </td>
                                         <td style="font-size: 12px;">
-                                        <?php echo $key['firstip']; ?>
+                                            <?php $cheatInfo = getCheatInfo($KeysRow['cheat']); echo $cheatInfo['name']; ?>
+                                        </td>
+                                        <td style="font-size: 12px;">
+                                            <?php echo $KeysRow['creator']; ?>
 
                                         </td>
                                         <td style="font-size: 12px;">
-                                        <?php echo $key['lastip']; ?>
+                                            <?php echo $KeysRow['firstip']; ?>
 
                                         </td>
-                                <?php } 
+                                        <td style="font-size: 12px;">
+                                            <?php echo $KeysRow['lastip']; ?>
+
+                                        </td>
+                                    <?php }
                                 } else if ($userInfo['role'] == "renter" ) {
-                                   if (!isset($_GET['type'])){
-                                         if(is_array($KeysRow)) {
-                                            foreach($KeysRow as $key) {  
+                                    if (!isset($_GET['type'])){
+                                        if(is_array($KeysRow)) {
+                                            foreach($KeysRow as $key) {
                                                 $cheatInfo = getCheatInfo($key['cheat']);
 
                                                 if($key['creator'] == $_COOKIE['login'] || $_COOKIE['login'] == $cheatInfo['creator'])
                                                 {?>
-                                        <tr>
-                                        <td style="font-size: 12px;">
-                                            <?php  echo $key['id']; ?>
-                                        </td>
-                                        <td style="font-size: 12px;">
-                                            <?php echo $key['key']; ?>
-                                        </td>
-                                        <td style="font-size: 12px;">
-                                            <?php echo $key['hwid']; ?>
-                                        </td>
-                                        <td style="font-size: 12px;">
-                                            <?php echo $key['subscribe'] / 86400; ?>
-                                        </td>
-                                        <td style="font-size: 12px;">
-                                            <?php if($key['status'] == "waiting") { ?>
-                                                <span class="badge bg-yellow-lt">Waiting</span>
-                                            <?php } ?>
-                                            <?php if($key['status'] == "banned") { ?>
-                                                <span class="badge bg-red-lt">Banned</span>
-                                            <?php } ?>
-                                            <?php if($key['status'] == "activated") { ?>
-                                                <span class="badge bg-green-lt">activated</span>
-                                            <?php } ?>
-                                            <?php if($key['status'] == "ended") { ?>
-                                                <span class="badge bg-blue-lt">expired</span>
-                                            <?php } ?>
-                                        </td>
-                                        <td style="font-size: 12px;">
-                                        <a href="../admin/keys.php?type=delete&id=<?php echo $key['id']; ?>" class="badge bg-red-lt">Delete</a>
-                                        <a href="../admin/keys.php?type=reset&key=<?php echo $key['key']; ?>" class="badge bg-yellow-lt">Reset HWID</a>
-                                        <?php if( $key['status'] == "banned") { ?>
-                                        <a href="../admin/keys.php?type=unban&key=<?php echo $key['key']; ?>" class="badge bg-green-lt">Unban</a>
-                                        <?php } else { ?>
-                                        <a href="../admin/keys.php?type=ban&key=<?php echo $key['key']; ?>" class="badge bg-blue-lt">Ban</a>
-                                        <?php } ?>
-                                        </td>
-                                        <td style="font-size: 12px;">
-                                        <?php $cheatInfo = getCheatInfo($key['cheat']); echo $cheatInfo['name']; ?>
-                                        </td>
-                                        <td style="font-size: 12px;">
-                                        <?php echo $key['creator']; ?>
+                                                    <tr>
+                                                    <td style="font-size: 12px;">
+                                                        <?php  echo $key['id']; ?>
+                                                    </td>
+                                                    <td style="font-size: 12px;">
+                                                        <?php echo $key['key']; ?>
+                                                    </td>
+                                                    <td style="font-size: 12px;">
+                                                        <?php echo $key['hwid']; ?>
+                                                    </td>
+                                                    <td style="font-size: 12px;">
+                                                        <?php echo $key['subscribe'] / 86400; ?>
+                                                    </td>
+                                                    <td style="font-size: 12px;">
+                                                        <?php if($key['status'] == "waiting") { ?>
+                                                            <span class="badge bg-yellow-lt">Waiting</span>
+                                                        <?php } ?>
+                                                        <?php if($key['status'] == "banned") { ?>
+                                                            <span class="badge bg-red-lt">Banned</span>
+                                                        <?php } ?>
+                                                        <?php if($key['status'] == "activated") { ?>
+                                                            <span class="badge bg-green-lt">activated</span>
+                                                        <?php } ?>
+                                                        <?php if($key['status'] == "ended") { ?>
+                                                            <span class="badge bg-blue-lt">expired</span>
+                                                        <?php } ?>
+                                                    </td>
+                                                    <td style="font-size: 12px;">
+                                                        <a href="../admin/keys.php?type=delete&id=<?php echo $key['id']; ?>" class="badge bg-red-lt">Delete</a>
+                                                        <a href="../admin/keys.php?type=reset&key=<?php echo $key['key']; ?>" class="badge bg-yellow-lt">Reset HWID</a>
+                                                        <?php if( $key['status'] == "banned") { ?>
+                                                            <a href="../admin/keys.php?type=unban&key=<?php echo $key['key']; ?>" class="badge bg-green-lt">Unban</a>
+                                                        <?php } else { ?>
+                                                            <a href="../admin/keys.php?type=ban&key=<?php echo $key['key']; ?>" class="badge bg-blue-lt">Ban</a>
+                                                        <?php } ?>
+                                                    </td>
+                                                    <td style="font-size: 12px;">
+                                                        <?php $cheatInfo = getCheatInfo($key['cheat']); echo $cheatInfo['name']; ?>
+                                                    </td>
+                                                    <td style="font-size: 12px;">
+                                                        <?php echo $key['creator']; ?>
 
-                                        </td>
-                                        <td style="font-size: 12px;">
-                                        <?php echo $key['firstip']; ?>
+                                                    </td>
+                                                    <td style="font-size: 12px;">
+                                                        <?php echo $key['firstip']; ?>
 
-                                        </td>
-                                        <td style="font-size: 12px;">
-                                        <?php echo $key['lastip']; ?>
+                                                    </td>
+                                                    <td style="font-size: 12px;">
+                                                        <?php echo $key['lastip']; ?>
 
-                                        </td>
-                                    <?php } 
+                                                    </td>
+                                                <?php }
+                                            }
                                         }
-                                    }
-                                ?>
-                                </tr>
-                                <?php } else { 
-                                    if($userInfo['owner'] == $_COOKIE['login']) {?>
-                                    <td style="font-size: 12px;">
-                                            <?php  echo $KeysRow['id']; ?>
-                                        </td>
-                                        <td style="font-size: 12px;">
-                                            <?php echo $KeysRow['key']; ?>
-                                        </td>
-                                        <td style="font-size: 12px;">
-                                            <?php echo $KeysRow['subscribe'] / 86400; ?>
-                                        </td>
-                                        <td style="font-size: 12px;">
-                                        <?php if($KeysRow['status'] == "waiting") { ?>
-                                            <span class="badge bg-yellow-lt">Waiting</span>
-                                        <?php } ?>
-                                        <?php if($KeysRow['status'] == "banned") { ?>
-                                            <span class="badge bg-red-lt">Banned</span>
-                                        <?php } ?>
-                                        <?php if($KeysRow['status'] == "activated") { ?>
-                                            <span class="badge bg-green-lt">activated</span>
-                                        <?php } ?>
-                                        <?php if($KeysRow['status'] == "ended") { ?>
-                                            <span class="badge bg-blue-lt">expired</span>
-                                        <?php } ?>
-                                        </td>
-                                        
-                                        <td style="font-size: 12px;">
-                                        <a href="../admin/keys.php?type=delete&id=<?php echo $KeysRow['id']; ?>" class="badge bg-red-lt">Delete</a>
-                                        <a href="../admin/keys.php?type=reset&key=<?php echo $KeysRow['key']; ?>" class="badge bg-yellow-lt">Reset HWID</a>
-                                        <?php if( $KeysRow['status'] == "banned") { ?>
-                                        <a href="../admin/keys.php?type=unban&key=<?php echo $KeysRow['key']; ?>" class="badge bg-green-lt">Unban</a>
-                                        <?php } else { ?>
-                                        <a href="../admin/keys.php?type=ban&key=<?php echo $KeysRow['key']; ?>" class="badge bg-blue-lt">Ban</a>
-                                        <?php } ?>                                        <td style="font-size: 12px;">
-                                        <?php $cheatInfo = getCheatInfo($KeysRow['cheat']); echo $cheatInfo['name']; ?>
-                                        </td>
-                                        <td style="font-size: 12px;">
-                                        <?php echo $KeysRow['creator']; ?>
-
-                                        </td>
-                                        <td style="font-size: 12px;">
-                                        <?php echo $key['firstip']; ?>
-
-                                        </td>
-                                        <td style="font-size: 12px;">
-                                        <?php echo $key['lastip']; ?>
-
-                                        </td>
-                                    <?php } }?>
-                                     <?php  
-                                    } else if ($userInfo['role'] == "seller" ) {
-                                        if (!isset($_GET['type'])){
-                                            if(is_array($KeysRow)) {
-                                                foreach($KeysRow as $key) { if($key['creator'] == $_COOKIE['login']) {?>
-                                            <tr>
+                                        ?>
+                                        </tr>
+                                    <?php } else {
+                                        if($userInfo['owner'] == $_COOKIE['login']) {?>
                                             <td style="font-size: 12px;">
-                                                <?php  echo $key['id']; ?>
-                                            </td>
-                                            <td style="font-size: 12px;">
-                                                <?php echo $key['key']; ?>
-                                            </td>
-                                            <td style="font-size: 12px;">
-                                            <?php echo $key['hwid']; ?>
-                                            </td>
-                                            <td style="font-size: 12px;">
-                                                <?php echo $key['subscribe'] / 86400; ?>
-                                            </td>
-                                            <td style="font-size: 12px;">
-                                                <?php if($key['status'] == "waiting") { ?>
-                                                    <span class="badge bg-yellow-lt">Waiting</span>
-                                                <?php } ?>
-                                                <?php if($key['status'] == "banned") { ?>
-                                                    <span class="badge bg-red-lt">Banned</span>
-                                                <?php } ?>
-                                                <?php if($key['status'] == "activated") { ?>
-                                                    <span class="badge bg-green-lt">activated</span>
-                                                <?php } ?>
-                                                <?php if($key['status'] == "ended") { ?>
-                                                    <span class="badge bg-blue-lt">expired</span>
-                                                <?php } ?>
-                                            </td>
-                                            <td style="font-size: 12px;">
-                                            <a href="../admin/keys.php?type=reset&key=<?php echo $key['key']; ?>" class="badge bg-yellow-lt">Reset HWID</a>
-                                            <?php if( $key['status'] == "banned") { ?>
-                                            <a href="../admin/keys.php?type=unban&key=<?php echo $key['key']; ?>" class="badge bg-green-lt">Unban</a>
-                                            <?php } else { ?>
-                                            <a href="../admin/keys.php?type=ban&key=<?php echo $key['key']; ?>" class="badge bg-blue-lt">Ban</a>
-                                            <?php } ?>         
-                                            </td>
-                                            <td style="font-size: 12px;">
-                                            <?php $cheatInfo = getCheatInfo($key['cheat']); echo $cheatInfo['name']; ?>
-                                            </td>
-                                            <td style="font-size: 12px;">
-                                            <?php echo $key['creator']; ?>
-
-                                            </td>
-                                            <td style="font-size: 12px;">
-                                        <?php echo $key['firstip']; ?>
-
-                                        </td>
-                                        <td style="font-size: 12px;">
-                                        <?php echo $key['lastip']; ?>
-
-                                        </td>
-                                        <?php } 
-                                        }
-                                    }
-                                    ?>
-                                    </tr>
-                                    <?php } else {  if($KeysRow['creator'] == $_COOKIE['login']) {?>
-                                        <td style="font-size: 12px;">
                                                 <?php  echo $KeysRow['id']; ?>
                                             </td>
                                             <td style="font-size: 12px;">
                                                 <?php echo $KeysRow['key']; ?>
                                             </td>
                                             <td style="font-size: 12px;">
-                                            <?php echo $KeysRow['hwid']; ?>
-                                            </td>
-                                            <td style="font-size: 12px;">
                                                 <?php echo $KeysRow['subscribe'] / 86400; ?>
                                             </td>
                                             <td style="font-size: 12px;">
+                                                <?php if($KeysRow['status'] == "waiting") { ?>
+                                                    <span class="badge bg-yellow-lt">Waiting</span>
+                                                <?php } ?>
+                                                <?php if($KeysRow['status'] == "banned") { ?>
+                                                    <span class="badge bg-red-lt">Banned</span>
+                                                <?php } ?>
+                                                <?php if($KeysRow['status'] == "activated") { ?>
+                                                    <span class="badge bg-green-lt">activated</span>
+                                                <?php } ?>
+                                                <?php if($KeysRow['status'] == "ended") { ?>
+                                                    <span class="badge bg-blue-lt">expired</span>
+                                                <?php } ?>
+                                            </td>
+
+                                            <td style="font-size: 12px;">
+                                                <a href="../admin/keys.php?type=delete&id=<?php echo $KeysRow['id']; ?>" class="badge bg-red-lt">Delete</a>
+                                                <a href="../admin/keys.php?type=reset&key=<?php echo $KeysRow['key']; ?>" class="badge bg-yellow-lt">Reset HWID</a>
+                                                <?php if( $KeysRow['status'] == "banned") { ?>
+                                                    <a href="../admin/keys.php?type=unban&key=<?php echo $KeysRow['key']; ?>" class="badge bg-green-lt">Unban</a>
+                                                <?php } else { ?>
+                                                    <a href="../admin/keys.php?type=ban&key=<?php echo $KeysRow['key']; ?>" class="badge bg-blue-lt">Ban</a>
+                                                <?php } ?>                                        <td style="font-size: 12px;">
+                                                <?php $cheatInfo = getCheatInfo($KeysRow['cheat']); echo $cheatInfo['name']; ?>
+                                            </td>
+                                            <td style="font-size: 12px;">
+                                                <?php echo $KeysRow['creator']; ?>
+
+                                            </td>
+                                            <td style="font-size: 12px;">
+                                                <?php echo $KeysRow['firstip']; ?>
+
+                                            </td>
+                                            <td style="font-size: 12px;">
+                                                <?php echo $KeysRow['lastip']; ?>
+
+                                            </td>
+                                        <?php } }?>
+                                    <?php
+                                } else if ($userInfo['role'] == "seller" ) {
+                                    if (!isset($_GET['type'])){
+                                        if(is_array($KeysRow)) {
+                                            foreach($KeysRow as $key) { if($key['creator'] == $_COOKIE['login']) {?>
+                                                <tr>
+                                                <td style="font-size: 12px;">
+                                                    <?php  echo $key['id']; ?>
+                                                </td>
+                                                <td style="font-size: 12px;">
+                                                    <?php echo $key['key']; ?>
+                                                </td>
+                                                <td style="font-size: 12px;">
+                                                    <?php echo $key['hwid']; ?>
+                                                </td>
+                                                <td style="font-size: 12px;">
+                                                    <?php echo $key['subscribe'] / 86400; ?>
+                                                </td>
+                                                <td style="font-size: 12px;">
+                                                    <?php if($key['status'] == "waiting") { ?>
+                                                        <span class="badge bg-yellow-lt">Waiting</span>
+                                                    <?php } ?>
+                                                    <?php if($key['status'] == "banned") { ?>
+                                                        <span class="badge bg-red-lt">Banned</span>
+                                                    <?php } ?>
+                                                    <?php if($key['status'] == "activated") { ?>
+                                                        <span class="badge bg-green-lt">activated</span>
+                                                    <?php } ?>
+                                                    <?php if($key['status'] == "ended") { ?>
+                                                        <span class="badge bg-blue-lt">expired</span>
+                                                    <?php } ?>
+                                                </td>
+                                                <td style="font-size: 12px;">
+                                                    <a href="../admin/keys.php?type=reset&key=<?php echo $key['key']; ?>" class="badge bg-yellow-lt">Reset HWID</a>
+                                                    <?php if( $key['status'] == "banned") { ?>
+                                                        <a href="../admin/keys.php?type=unban&key=<?php echo $key['key']; ?>" class="badge bg-green-lt">Unban</a>
+                                                    <?php } else { ?>
+                                                        <a href="../admin/keys.php?type=ban&key=<?php echo $key['key']; ?>" class="badge bg-blue-lt">Ban</a>
+                                                    <?php } ?>
+                                                </td>
+                                                <td style="font-size: 12px;">
+                                                    <?php $cheatInfo = getCheatInfo($key['cheat']); echo $cheatInfo['name']; ?>
+                                                </td>
+                                                <td style="font-size: 12px;">
+                                                    <?php echo $key['creator']; ?>
+
+                                                </td>
+                                                <td style="font-size: 12px;">
+                                                    <?php echo $key['firstip']; ?>
+
+                                                </td>
+                                                <td style="font-size: 12px;">
+                                                    <?php echo $key['lastip']; ?>
+
+                                                </td>
+                                            <?php }
+                                            }
+                                        }
+                                        ?>
+                                        </tr>
+                                    <?php } else {  if($KeysRow['creator'] == $_COOKIE['login']) {?>
+                                        <td style="font-size: 12px;">
+                                            <?php  echo $KeysRow['id']; ?>
+                                        </td>
+                                        <td style="font-size: 12px;">
+                                            <?php echo $KeysRow['key']; ?>
+                                        </td>
+                                        <td style="font-size: 12px;">
+                                            <?php echo $KeysRow['hwid']; ?>
+                                        </td>
+                                        <td style="font-size: 12px;">
+                                            <?php echo $KeysRow['subscribe'] / 86400; ?>
+                                        </td>
+                                        <td style="font-size: 12px;">
                                             <?php if($KeysRow['status'] == "waiting") { ?>
-                                            <span class="badge bg-yellow-lt">Waiting</span>
+                                                <span class="badge bg-yellow-lt">Waiting</span>
                                             <?php } ?>
                                             <?php if($KeysRow['status'] == "banned") { ?>
                                                 <span class="badge bg-red-lt">Banned</span>
@@ -423,34 +428,41 @@ if(isset($_GET['type']))
                                             <?php if($KeysRow['status'] == "ended") { ?>
                                                 <span class="badge bg-blue-lt">expired</span>
                                             <?php } ?>
-                                            </td>
-                                            <td style="font-size: 12px;">
+                                        </td>
+                                        <td style="font-size: 12px;">
                                             <a href="../admin/keys.php?type=reset&key=<?php echo $KeysRow['key']; ?>" class="badge bg-yellow-lt">Reset HWID</a>
                                             <?php if( $KeysRow['status'] == "banned") { ?>
-                                            <a href="../admin/keys.php?type=unban&key=<?php echo $KeysRow['key']; ?>" class="badge bg-green-lt">Unban</a>
+                                                <a href="../admin/keys.php?type=unban&key=<?php echo $KeysRow['key']; ?>" class="badge bg-green-lt">Unban</a>
                                             <?php } else { ?>
-                                            <a href="../admin/keys.php?type=ban&key=<?php echo $KeysRow['key']; ?>" class="badge bg-blue-lt">Ban</a>
+                                                <a href="../admin/keys.php?type=ban&key=<?php echo $KeysRow['key']; ?>" class="badge bg-blue-lt">Ban</a>
                                             <?php } ?>                                            </td>
-                                            <td style="font-size: 12px;">
+                                        <td style="font-size: 12px;">
                                             <?php $cheatInfo = getCheatInfo($KeysRow['cheat']); echo $cheatInfo['name']; ?>
-                                            </td>
-                                            <td style="font-size: 12px;">
+                                        </td>
+                                        <td style="font-size: 12px;">
                                             <?php echo $KeysRow['creator']; ?>
 
-                                            </td>
-                                            <td style="font-size: 12px;">
-                                            <?php echo $key['firstip']; ?>
+                                        </td>
+                                        <td style="font-size: 12px;">
+                                            <?php echo $KeysRow['firstip']; ?>
 
-                                            </td>
-                                            <td style="font-size: 12px;">
-                                            <?php echo $key['lastip']; ?>
+                                        </td>
+                                        <td style="font-size: 12px;">
+                                            <?php echo $KeysRow['lastip']; ?>
 
-                                            </td>
-                                        <?php } 
-                                        } 
-                                    }?>
+                                        </td>
+                                    <?php }
+                                    }
+                                }?>
                                 </tbody>
                             </table>
+                            <?php
+                            for($pages=1;$pages<=num_pages('keys', '10');$pages++) {
+                                $numofpgs = num_pages('keys', '10');
+                                $balls = "<a class='btn btn-dark btn-icon' href='keys.php?page=$pages'>$pages</a>";
+                                echo $balls;
+                            }
+                            ?>
                         </div>
                     </div>
                 </div>

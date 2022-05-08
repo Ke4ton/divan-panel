@@ -4,15 +4,21 @@ require_once '../../controllers/DbController.php';
 include_once '../../controllers/UserController.php';
 include_once '../../controllers/KeysController.php';
 include_once '../../controllers/CheatController.php';
-
+include_once '../../controllers/PageController.php';
 $UserCookie = login($_COOKIE['login'], $_COOKIE['password']);
+if(!isset($_GET['page'])) {
+    $page = 1;
+}
+else {
+    $page = $_GET['page'];
+}
 if(!$UserCookie){
     return header('Location: /index.php');
 }
 
 $userInfo = getUserInfo($_COOKIE['login']);
 
-$KeysRow = getAllKeys();
+$KeysRow = getAllKeys($page);
 
 // костыль ебаный, но так как сроки горят делаю максимально быстро
 $allCheats = getAllCheats();
@@ -209,7 +215,8 @@ if(isset($_GET['type']))
                                         <?php echo $KeysRow['lastip']; ?>
 
                                         </td>
-                                <?php } 
+                                <?php
+}
                                 } else if ($userInfo['role'] == "renter" ) {
                                    if (!isset($_GET['type'])){
                                          if(is_array($KeysRow)) {
@@ -267,6 +274,7 @@ if(isset($_GET['type']))
                                         </td>
                                     <?php } } 
                                         }
+
                                     }
                                 ?>
                                 </tr>
@@ -286,7 +294,6 @@ if(isset($_GET['type']))
                                                 <span class="badge bg-green-lt">Waiting</span>
                                             <?php } ?>
                                         </td>
-                                        
                                         <td style="font-size: 12px;">
                                         <a href="../admin/keys.php?type=delete&id=<?php echo $KeysRow['id']; ?>" class="badge bg-red-lt">Delete</a>
                                         <a href="../admin/keys.php?type=reset&key=<?php echo $KeysRow['key']; ?>" class="badge bg-yellow-lt">Reset HWID</a>
@@ -410,11 +417,11 @@ if(isset($_GET['type']))
 
                                             </td>
                                             <td style="font-size: 12px;">
-                                            <?php echo $key['firstip']; ?>
+                                            <?php echo $KeysRow['firstip']; ?>
 
                                             </td>
                                             <td style="font-size: 12px;">
-                                            <?php echo $key['lastip']; ?>
+                                            <?php echo $KeysRow['lastip']; ?>
 
                                             </td>
                                         <?php } 
@@ -422,6 +429,13 @@ if(isset($_GET['type']))
                                     }?>
                                 </tbody>
                             </table>
+                            <?php
+                            for($pages=1;$pages<=num_pages_act_keys(10);$pages++) {
+                                $numofpgs = num_pages_act_keys(10);
+                                $balls = "<a class='btn btn-dark btn-icon' href='activated_keys.php?page=$pages'>$pages</a>";
+                                echo $balls;
+                            }
+                            ?>
                         </div>
                     </div>
                 </div>

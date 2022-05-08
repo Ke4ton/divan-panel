@@ -96,11 +96,12 @@ function getAllKeysByUsername($username)
     return $keys;
 }
 
-function getAllKeys()
+function getAllKeys($page)
 {
     global $db;
-
-    $query = "SELECT * FROM `keys` WHERE 1";
+    $rpp = 10;
+    $first_result = ($page-1)*$rpp;
+    $query = "SELECT * FROM `keys`  LIMIT ".$first_result. ',' .$rpp.";";
 
     $result = mysqli_query($db, $query);
 
